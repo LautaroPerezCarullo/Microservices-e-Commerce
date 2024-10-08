@@ -1,0 +1,3 @@
+# Exclude Environment Variables Files
+*.env
+*/venv/
