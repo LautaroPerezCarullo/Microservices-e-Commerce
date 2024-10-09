@@ -1,14 +1,17 @@
 import unittest, os
 from app import create_app, db
 from app.model import Purchase
+from app.service import PurchaseService
+
+purchase_service = PurchaseService()
 
 class PurchaseTestCase(unittest.TestCase):
     
     def setUp(self):
         # Purchase
         self.PRODUCT_ID_TEST = 1
-        self.PURCHASE_DATE = '2024-10-08 14:30:00'
-        self.DELIVERY_ADDRESS = 'Calle 123'
+        self.PURCHASE_DATE_TEST = '2024-10-08 14:30:00'
+        self.DELIVERY_ADDRESS_TEST = 'Calle 123'
         
         os.environ['FLASK_CONTEXT'] = 'testing'
         self.app = create_app()
@@ -25,13 +28,23 @@ class PurchaseTestCase(unittest.TestCase):
         purchase = self.__get_purchase()
 
         self.assertEqual(purchase.product_id, self.PRODUCT_ID_TEST)
-        self.assertEqual(purchase.purchase_date, self.PURCHASE_DATE)
-        self.assertEqual(purchase.delivery_address, self.DELIVERY_ADDRESS)
+        self.assertEqual(purchase.purchase_date, self.PURCHASE_DATE_TEST)
+        self.assertEqual(purchase.delivery_address, self.DELIVERY_ADDRESS_TEST)
+
+    def test_save_purchase(self):
+        purchase = self.__get_purchase()
+        saved_pruchase = purchase_service.save(purchase)
+
+        self.assertEqual(saved_pruchase.id, 1)
+        self.assertEqual(saved_pruchase.product_id, self.PRODUCT_ID_TEST)
+        self.assertEqual(saved_pruchase.purchase_date.strftime('%Y-%m-%d %H:%M:%S'), self.PURCHASE_DATE_TEST)
+        self.assertEqual(saved_pruchase.delivery_address, self.DELIVERY_ADDRESS_TEST)
+
 
     def __get_purchase(self) -> Purchase:
         purchase = Purchase()
         purchase.product_id = self.PRODUCT_ID_TEST
-        purchase.purchase_date = self.PURCHASE_DATE
-        purchase.delivery_address = self.DELIVERY_ADDRESS
+        purchase.purchase_date = self.PURCHASE_DATE_TEST
+        purchase.delivery_address = self.DELIVERY_ADDRESS_TEST
         
         return purchase

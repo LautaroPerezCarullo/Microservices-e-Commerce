@@ -1,6 +1,9 @@
 import unittest, os
 from app import create_app, db
 from app.model import Payment
+from app.service import PaymentService
+
+payment_service = PaymentService()
 
 class PaymentTestCase(unittest.TestCase):
     
@@ -27,6 +30,15 @@ class PaymentTestCase(unittest.TestCase):
         self.assertEqual(payment.product_id, self.PRODUCT_ID_TEST)
         self.assertEqual(payment.price, self.PRICE_TEST)
         self.assertEqual(payment.payment_method, self.PAYMENT_METHOD_TEST)
+
+    def test_save_payment(self):
+        payment = self.__get_payment()
+        saved_payment = payment_service.save(payment)
+
+        self.assertEqual(saved_payment.id, 1)
+        self.assertEqual(saved_payment.product_id, self.PRODUCT_ID_TEST)
+        self.assertEqual(saved_payment.price, self.PRICE_TEST)
+        self.assertEqual(saved_payment.payment_method, self.PAYMENT_METHOD_TEST)
 
     def __get_payment(self) -> Payment:
         payment = Payment()
