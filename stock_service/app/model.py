@@ -7,4 +7,4 @@ class Stock(db.Model):
     product_id: int = db.Column(db.Integer, nullable=False)    
     transaction_date: str = db.Column(db.DateTime, nullable=False)
     amount: int = db.Column(db.Integer, nullable=False)
-    input_ouput: int = db.Column(db.Integer, nullable=False)
+    input_output: int = db.Column(db.Integer, nullable=False)
