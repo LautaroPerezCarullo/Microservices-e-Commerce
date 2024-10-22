@@ -1,0 +1,13 @@
+services:
+  ms-catalog:
+      build:
+        context: .
+      container_name: catalog_service
+      ports:
+        - "5001:5001"
+      networks:
+        - ecommerce_network
+
+networks:
+  ecommerce_network:
+    external: true

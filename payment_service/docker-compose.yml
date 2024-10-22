@@ -1,0 +1,13 @@
+services:
+  ms-payment:
+      build:
+        context: .
+      container_name: payment_service
+      ports:
+        - "5003:5003"
+      networks:
+        - ecommerce_network
+
+networks:
+  ecommerce_network:
+    external: true

@@ -1,0 +1,13 @@
+services:
+  e_commerce_app:
+      build:
+        context: .
+      container_name: ecommerce_app
+      ports:
+        - "5000:5000"
+      networks:
+        - ecommerce_network
+
+networks:
+  ecommerce_network:
+    external: true

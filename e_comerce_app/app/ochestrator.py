@@ -83,12 +83,13 @@ class Orchester:
 
             stock_response = self.update_stock(product_id,transaction_date, amount, input_output)
 
-            print(f"{stock_response}")
-
             if purchase_response['status_code'] == 201 and payment_response['status_code'] == 201 and stock_response['status_code'] == 100:
                 response_builder.add_message("Succesful Transaction").add_status_code(201).add_data(data)
                 return response_schema.dump(response_builder.build()), 201
-
+            
+            else:
+                response_builder.add_message("Fuck").add_status_code(501)
+                return response_schema.dump(response_builder.build()), 501
         except Exception as e:
             response_builder.add_message(f"Transaction Error: {str(e)}").add_status_code(500)
             return response_schema.dump(response_builder.build()), 500
