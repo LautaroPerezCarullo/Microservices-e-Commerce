@@ -1,0 +1,6 @@
+FLASK_APP = app.py
+FLASK_ENV = development
+CATALOG_SERVICE_URL = "http://ms_name:ms_port/api/v1"
+PURCHASE_SERVICE_URL = "http://ms_name:ms_port/api/v1"
+PAYMENT_SERVICE_URL = "http://ms_name:ms_port/api/v1"
+STOCK_SERVICE_URL = "http://ms_name:ms_port/api/v1"

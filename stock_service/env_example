@@ -1,0 +1,6 @@
+FLASK_APP = app.py
+FLASK_ENV = development
+SECRET_KEY = secret_key
+DEV_DB_URI = 'postgresql://user:password@localhost:port/database'
+TEST_DB_URI = 'postgresql://user:password@localhost:port/database'
+PROD_DB_URI = 'postgresql://user:password@localhost:port/database'
