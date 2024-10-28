@@ -4,7 +4,7 @@ services:
         context: .
       container_name: catalog_service
       ports:
-        - "5001:5001"
+        - "5001:5000"
       networks:
         - ecommerce_network
 
