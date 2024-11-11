@@ -21,3 +21,12 @@ def add():
     except ValidationError as err:
         response_builder.add_message("Validation error").add_status_code(422).add_data(err.messages)
         return response_schema.dump(response_builder.build()), 422
+    
+@purchase_bp.route('/purchases/<int:id>', methods=['DELETE'])   
+def delete(id):
+    purchase = purchase_service.delete(id)
+    if purchase.deleted_at:
+        status_code = 200
+    else:
+        status_code = 500
+    return purchase_schema.dump(purchase), status_code

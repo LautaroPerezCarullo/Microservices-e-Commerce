@@ -8,3 +8,9 @@ class PaymentRepository:
         db.session.add(payment)
         db.session.commit()
         return payment
+    
+    def delete(self, payment_id: int) -> Payment:
+        payment = Payment.query.get(payment_id)
+        payment.deleted_at = db.func.now()
+        db.session.commit()
+        return payment

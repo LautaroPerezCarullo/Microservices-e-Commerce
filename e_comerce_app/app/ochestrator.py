@@ -4,69 +4,26 @@ from dotenv import load_dotenv
 from pathlib import Path
 from .response_message import ResponseBuilder
 from .response_schema import ResponseSchema
+from saga import SagaBuilder, SagaError
+import logging
+from app.services import MS_CatalogService, MS_PurchaseService, MS_PaymentService, MS_StockService
 
 
 basedir = os.path.abspath(Path(__file__).parents[2])
 load_dotenv(os.path.join(basedir, '.env'))
 response_schema = ResponseSchema()
 
+catalog_service = MS_CatalogService()
+purchase_service = MS_PurchaseService()
+payment_service = MS_PaymentService()
+stock_service = MS_StockService()
+
 class Orchester:
-    def __init__(self):
-        self.catalog_url = os.getenv("CATALOG_SERVICE_URL")
-        self.payment_url = os.getenv("PAYMENT_SERVICE_URL")
-        self.purchase_url = os.getenv("PURCHASE_SERVICE_URL")
-        self.stock_url = os.getenv("STOCK_SERVICE_URL")
-
-    def get_catalog(self):
-        print(f"{self.catalog_url}/products")
-        response = requests.get(f"{self.catalog_url}/products")
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception("Error getting catalog")
-    
-    def get_product(self, product_id):
-        response = requests.get(f"{self.catalog_url}/products/{product_id}")
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception("Error getting product")
-
-    def purchase_processing(self, product_id, purchase_date, delivery_address):
-        response = requests.post(f"{self.purchase_url}/purchases/add", json={"product_id": product_id, "purchase_date": purchase_date, "delivery_address": delivery_address})
-        if response.status_code == 201:
-            return response.json()
-        elif response.status_code == 422:
-            return response.json()
-        else:
-            raise Exception("Error processing purchase")
-
-
-    def payment_processing(self, product_id, price, payment_method):
-        response = requests.post(f"{self.payment_url}/payments/add", json={"product_id": product_id, "price": price, "payment_method": payment_method})
-        if response.status_code == 201:
-            return response.json()
-        elif response.status_code == 422:
-            return response.json()
-        else:
-            raise Exception("Error processing payment")
-
-    def update_stock(self, stock_id, transaction_date, amount, input_output):
-
-        response_builder = ResponseBuilder()
-
-        response = requests.put(f"{self.stock_url}/stocks/update/{stock_id}", json={"transaction_date": transaction_date, "amount": amount, "input_output": input_output})
-        if response.status_code == 200:
-            return response.json()
-        else:
-            response_builder.add_message("Error updating stock").add_status_code(500)
-            return response_schema.dump(response_builder.build()), 500
-        
-
+      
     def purchase(self, product_id, data):
-        
-        response_builder = ResponseBuilder()
 
+        
+        print(data)
         purchase_date = data['purchase_date']
         delivery_address = data['delivery_address']
         price = data['price']
@@ -76,20 +33,25 @@ class Orchester:
         input_output = data['input_output']
         
         try:
-
-            purchase_response = self.purchase_processing(product_id, purchase_date, delivery_address)
-
-            payment_response = self.payment_processing(product_id, price, payment_method)
-
-            stock_response = self.update_stock(product_id,transaction_date, amount, input_output)
-
-            if purchase_response['status_code'] == 201 and payment_response['status_code'] == 201 and stock_response['status_code'] == 100:
-                response_builder.add_message("Succesful Transaction").add_status_code(201).add_data(data)
-                return response_schema.dump(response_builder.build()), 201
+            SagaBuilder.create()\
+                .action(lambda: purchase_service.purchase_processing(product_id, purchase_date, delivery_address), lambda: purchase_service.cancel_purchase(purchase_service.id)) \
+                .action(lambda: payment_service.payment_processing(product_id, price, payment_method), lambda: payment_service.cancel_payment(payment_service.id)) \
+                .action(lambda: stock_service.update_stock(product_id, transaction_date, amount, 2), lambda: stock_service.update_stock(product_id, transaction_date, amount, 1)) \
+                .build().execute()
             
-            else:
-                response_builder.add_message("Fuck").add_status_code(501)
-                return response_schema.dump(response_builder.build()), 501
-        except Exception as e:
-            response_builder.add_message(f"Transaction Error: {str(e)}").add_status_code(500)
-            return response_schema.dump(response_builder.build()), 500
+            return {"message": "Purchase completed successfully"}, 200    
+
+        except SagaError as e:
+            logging.error(e)
+            return {"message": "Error Purchase Processing"}, 500
+
+    def get_catalog(self):
+        return catalog_service.get_catalog()
+    
+    def get_product(self, product_id):
+        return catalog_service.get_product(product_id)
+
+    # def set_purchase_id(self, response):
+    #     self.purchase_id = response.get("id")
+    # def set_payment_id(self, response):
+    #     self.payment_id = response.get("id")

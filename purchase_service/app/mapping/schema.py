@@ -6,6 +6,7 @@ class PurchaseSchema(Schema):
     product_id = fields.Integer(required=True, validate=validate.Range(min=1, max=5))
     purchase_date = fields.DateTime(required=True)
     delivery_address = fields.String(required=True)
+    deleted_at = fields.DateTime()
     
     @post_load
     def make_purchase(self, data, **kwargs):

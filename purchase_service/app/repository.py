@@ -9,3 +9,9 @@ class PurchaseRepository:
         db.session.commit()
         return purchase
     
+    def delete(self, purchase_id: int) -> Purchase:
+        purchase = Purchase.query.get(purchase_id)
+        purchase.deleted_at = db.func.now()
+        db.session.commit()
+        return purchase
+    
