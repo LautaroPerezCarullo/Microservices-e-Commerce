@@ -16,13 +16,23 @@ class MS_StockService:
     def __init__(self):
         self.stock_url = os.getenv("STOCK_SERVICE_URL")
 
-    def update_stock(self, stock_id, transaction_date, amount, input_output):
-
-        response_builder = ResponseBuilder()
-
-        response = requests.put(f"{self.stock_url}/stocks/update/{stock_id}", json={"transaction_date": transaction_date, "amount": amount, "input_output": input_output})
-        if response.status_code == 200:
-            logging.info(f"Stock Updated")
+    def stock_transaction(self, product_id, amount, input_output):
+        self.response = requests.post(f"{self.stock_url}/stocks/add", json={"product_id": product_id, "amount": amount, "input_output": input_output})
+        if self.response.status_code == 201:
+            self.id = self.response.json().get("data", {}).get("id")
+            logging.info(f"Stock Transaction <- {self.response.json()}")
+            logging.info(f"Succesful stock transaction ID: {self.id}")
         else:
-            logging.info("Stock Updating Failed")
-            raise Exception("Error Updating Stock")
+            logging.info("Stock Transaction Error")
+            raise Exception("Error Transfering Stock")
+        
+    def stock_compensation(self, product_id, amount, input_output):
+        self.response = requests.post(f"{self.stock_url}/stocks/add", json={"product_id": product_id, "amount": amount, "input_output": input_output})
+        if self.response.status_code == 201:
+            self.id = self.response.json().get("data", {}).get("id")
+            logging.info(f"Stock Compensation <- {self.response.json()}")
+            logging.info(f"Succesful stock compensation ID: {self.id}")
+        else:
+            logging.info("Stock Compensation Error")
+            raise Exception("Error Compensating Stock")
+    

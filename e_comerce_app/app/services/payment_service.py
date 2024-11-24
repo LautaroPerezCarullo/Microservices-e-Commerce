@@ -20,6 +20,7 @@ class MS_PaymentService:
             logging.info(f"Payment <- {self.response.json()}")
             logging.info(f"Succesful payment ID: {self.id}")
         else:
+            logging.info("Payment Processing Error")
             raise Exception("Error processing payment")
         
     def cancel_payment(self, payment_id):
@@ -27,4 +28,5 @@ class MS_PaymentService:
         if response.status_code == 200:
             logging.info(f"Succesful payment compensation. Payment ID: {self.id}")
         else:
+            logging.info("Payment Compensation Error")
             raise Exception("Error compensating payment")

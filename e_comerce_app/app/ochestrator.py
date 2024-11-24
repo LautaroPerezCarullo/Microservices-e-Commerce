@@ -22,21 +22,16 @@ class Orchester:
       
     def purchase(self, product_id, data):
 
-        
-        print(data)
-        purchase_date = data['purchase_date']
         delivery_address = data['delivery_address']
         price = data['price']
         payment_method = data['payment_method']
-        transaction_date = data['transaction_date']
         amount = data['amount']
-        input_output = data['input_output']
         
         try:
             SagaBuilder.create()\
-                .action(lambda: purchase_service.purchase_processing(product_id, purchase_date, delivery_address), lambda: purchase_service.cancel_purchase(purchase_service.id)) \
+                .action(lambda: purchase_service.purchase_processing(product_id, delivery_address), lambda: purchase_service.cancel_purchase(purchase_service.id)) \
                 .action(lambda: payment_service.payment_processing(product_id, price, payment_method), lambda: payment_service.cancel_payment(payment_service.id)) \
-                .action(lambda: stock_service.update_stock(product_id, transaction_date, amount, 2), lambda: stock_service.update_stock(product_id, transaction_date, amount, 1)) \
+                .action(lambda: stock_service.stock_transaction(product_id, amount, 2), lambda: stock_service.stock_compensation(product_id, amount, 1)) \
                 .build().execute()
             
             return {"message": "Purchase completed successfully"}, 200    
@@ -44,14 +39,3 @@ class Orchester:
         except SagaError as e:
             logging.error(e)
             return {"message": "Error Purchase Processing"}, 500
-
-    def get_catalog(self):
-        return catalog_service.get_catalog()
-    
-    def get_product(self, product_id):
-        return catalog_service.get_product(product_id)
-
-    # def set_purchase_id(self, response):
-    #     self.purchase_id = response.get("id")
-    # def set_payment_id(self, response):
-    #     self.payment_id = response.get("id")

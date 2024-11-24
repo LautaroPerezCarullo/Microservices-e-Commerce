@@ -4,6 +4,7 @@ from app import db
 class PurchaseRepository:
     
     def save(self, purchase: Purchase) -> Purchase:
+        purchase.purchase_date = db.func.now()
         # Save new purchase
         db.session.add(purchase)
         db.session.commit()

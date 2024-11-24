@@ -18,9 +18,14 @@ def add():
         data = purchase_schema.dump(purchase_service.save(purchase))
         response_builder.add_message("Purchase added").add_status_code(201).add_data(data)
         return response_schema.dump(response_builder.build()), 201
+    
     except ValidationError as err:
         response_builder.add_message("Validation error").add_status_code(422).add_data(err.messages)
         return response_schema.dump(response_builder.build()), 422
+    
+    except Exception as e:
+        response_builder.add_message(f"An unexpected error occurred adding purchase: {str(e)}").add_status_code(500)
+        return response_schema.dump(response_builder.build()), 500
     
 @purchase_bp.route('/purchases/<int:id>', methods=['DELETE'])   
 def delete(id):
