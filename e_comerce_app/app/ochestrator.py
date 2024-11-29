@@ -38,4 +38,10 @@ class Orchester:
 
         except SagaError as e:
             logging.error(e)
-            return {"message": "Error Purchase Processing"}, 500
+            return {"message": str(e)}, 500
+        
+    def get_catalog(self):
+        return catalog_service.get_catalog()
+    
+    def get_product(self, product_id):
+        return catalog_service.get_product(product_id)
