@@ -10,14 +10,6 @@ services:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
-            # el valor de REDIS_HOST = al container_name que tiene en su propio docker-compose.yml
-            # - REDIS_HOST=${REDIS_HOST}
-            # - REDIS_PORT=${REDIS_PORT}
-            # - REDIS_PASSWORD=${REDIS_PASSWORD}
-            # - REDIS_DB=${REDIS_DB}
-            # el valor de MSCATALOGO_URL, MSPAGOS_URL, MSCOMPRAS_URL, MSINVENTARIOS_URL = al container_name con el puerto 5000 ejemplo http://mscatalogo:5000
-            # desde el microservicio ecomerce se puede acceder a los microservicios mscatalogo, mspagos, mscompras, msinventarios por el container_name:puerto
-            # desde el host se accede a los microservicios como http://localhost:puerto ejemplo http://localhost:5001 para mscatalogo, http://localhost:5002 para mspagos, http://localhost:5003 para mscompras, http://localhost:5004 para msinventarios
             - CATALOG_SERVICE_URL=${CATALOG_SERVICE_URL}
             - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL}
             - PURCHASE_SERVICE_URL=${PURCHASE_SERVICE_URL}
@@ -36,31 +28,10 @@ services:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
-            # - REDIS_HOST=${REDIS_HOST}
-            # - REDIS_PORT=${REDIS_PORT}
-            # - REDIS_PASSWORD=${REDIS_PASSWORD}
-            # - REDIS_DB=${REDIS_DB}
-            # la URI para el servidor se obtiene de container_name del docker-compose de postgresql: [postgresql://usuario:password@postgresql-servidor:5432/ecommerce]
-            - TEST_DB_URI=${TEST_DB_URI}
-            - DEV_DB_URI=${DEV_DB_URI}
-            - PROD_DB_URI=${PROD_DB_URI}
-    mspayment:
-        build:
-            context: ../payment_service
-            dockerfile: Dockerfile
-        container_name: mspayment
-        depends_on:
-            - e_commerce_app
-        ports:
-            - 5002:5000
-        networks:
-            - ecommerce_network
-        environment:
-            - FLASK_CONTEXT=${FLASK_CONTEXT}
-            # - REDIS_HOST=${REDIS_HOST}
-            # - REDIS_PORT=${REDIS_PORT}
-            # - REDIS_PASSWORD=${REDIS_PASSWORD}
-            # - REDIS_DB=${REDIS_DB}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_DB=${REDIS_DB}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
@@ -72,15 +43,27 @@ services:
         depends_on:
             - e_commerce_app
         ports:
+            - 5002:5000
+        networks:
+            - ecommerce_network
+        environment:
+            - FLASK_CONTEXT=${FLASK_CONTEXT}
+            - TEST_DB_URI=${TEST_DB_URI}
+            - DEV_DB_URI=${DEV_DB_URI}
+            - PROD_DB_URI=${PROD_DB_URI}
+    mspayment:
+        build:
+            context: ../payment_service
+            dockerfile: Dockerfile
+        container_name: mspayment
+        depends_on:
+            - e_commerce_app
+        ports:
             - 5003:5000
         networks:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
-            # - REDIS_HOST=${REDIS_HOST}
-            # - REDIS_PORT=${REDIS_PORT}
-            # - REDIS_PASSWORD=${REDIS_PASSWORD}
-            # - REDIS_DB=${REDIS_DB}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
@@ -97,14 +80,10 @@ services:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
-            # - REDIS_HOST=${REDIS_HOST}
-            # - REDIS_PORT=${REDIS_PORT}
-            # - REDIS_PASSWORD=${REDIS_PASSWORD}
-            # - REDIS_DB=${REDIS_DB}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
-# Todos los microservicios y servicios (redis, postgresql) deben estar en la misma red
+
 networks:
     ecommerce_network:
         external: true

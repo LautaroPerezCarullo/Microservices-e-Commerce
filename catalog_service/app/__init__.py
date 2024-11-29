@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import config
+from config import cache_config
+from flask_caching import Cache
 from .routes import RouteApp
 import os
 
 db = SQLAlchemy()
+cache = Cache()
 
 def create_app():
     app_context = os.getenv("FLASK_CONTEXT")
@@ -17,5 +20,6 @@ def create_app():
     route.init_app(app)
 
     db.init_app(app)
+    cache.init_app(app, config=cache_config)
 
     return app     

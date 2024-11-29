@@ -19,7 +19,10 @@ def view_catalog():
 @product_bp.route('/products/<int:id>', methods=['GET'])
 def find_product(id):
     response_builder = ResponseBuilder()
-    data = product_schema.dump(product_service.find(id))
+    data = None
+    product = product_service.find(id)
+    if product:
+        data = product_schema.dump(product)
     if data:
         response_builder.add_message("Finded Product").add_status_code(200).add_data(data)
         return response_schema.dump(response_builder.build()), 200

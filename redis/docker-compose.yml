@@ -1,0 +1,16 @@
+services:
+  redis:
+    image: redis:7-bookworm
+    container_name: redis
+    volumes:
+      - ./data:/data
+      - ./data/redis.conf:/data/redis.conf
+    command: redis-server /data/redis.conf --loglevel notice --requirepass ${REDIS_PASSWORD}
+    networks:
+      - ecommerce_network
+
+networks:
+    ecommerce_network:
+      external: true
+
+
