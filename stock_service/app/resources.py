@@ -16,9 +16,13 @@ def add():
     response_builder = ResponseBuilder()
     try:
         stock = stock_schema.load(request.json)
-        data = stock_schema.dump(stock_service.save(stock))
-        response_builder.add_message("Stock added").add_status_code(201).add_data(data)
-        return response_schema.dump(response_builder.build()), 201
+        if stock.input_output == 2 and stock.amount > stock_service.calculate_stock(stock):
+            response_builder.add_message("Insufficient stock for the requested product").add_status_code(400)
+            return response_schema.dump(response_builder.build()), 400
+        else: 
+            data = stock_schema.dump(stock_service.save(stock))
+            response_builder.add_message("Stock added").add_status_code(201).add_data(data)
+            return response_schema.dump(response_builder.build()), 201
     
     except ValidationError as e:
         response_builder.add_message("Validation error").add_status_code(422).add_data(e.messages)
