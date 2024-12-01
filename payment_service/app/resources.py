@@ -21,6 +21,9 @@ def save():
     except ValidationError as err:
         response_builder.add_message("Validation error").add_status_code(422).add_data(err.messages)
         return response_schema.dump(response_builder.build()), 422
+    except Exception as e:
+        response_builder.add_message(f"An unexpected error occurred adding payment: {str(e)}").add_status_code(500)
+        return response_schema.dump(response_builder.build()), 500
     
 @payment_bp.route('/payments/<int:id>', methods=['DELETE'])   
 def delete(id):

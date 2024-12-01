@@ -6,7 +6,7 @@ from .response_message import ResponseBuilder
 from .response_schema import ResponseSchema
 from saga import SagaBuilder, SagaError
 import logging
-from app.services import MS_CatalogService, MS_PurchaseService, MS_PaymentService, MS_StockService
+from app.services import MS_CatalogService, MS_PurchaseService, MS_PaymentService, MS_StockService, Response_Management
 
 
 basedir = os.path.abspath(Path(__file__).parents[2])
@@ -38,7 +38,7 @@ class Orchester:
 
         except SagaError as e:
             logging.error(e)
-            return {"message": str(e)}, 500
+            return Response_Management(e).to_response()
         
     def get_catalog(self):
         return catalog_service.get_catalog()
