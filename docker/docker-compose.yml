@@ -80,6 +80,10 @@ services:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_DB=${REDIS_DB}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
