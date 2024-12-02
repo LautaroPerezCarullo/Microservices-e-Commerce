@@ -36,13 +36,14 @@ def add():
 def delete(id):
     response_builder = ResponseBuilder()
     try:
-        purchase = purchase_service.delete(id)
-        if purchase.deleted_at:
-            status_code = 200
-        else:
-            status_code = 500
-        return purchase_schema.dump(purchase), status_code
+        data = purchase_service.delete(id)
+        response_builder.add_message("Purchase soft deleted").add_status_code(200).add_data(data)
+        return response_schema.dump(response_builder.build()), 200
     
     except OperationalError as e:
         response_builder.add_message("Can't set connection with database").add_status_code(503).add_data(e.messages)
         return response_schema.dump(response_builder.build()), 503
+    
+    except Exception as e:
+        response_builder.add_message(f"An unexpected error occurred compensating purchase: {str(e)}").add_status_code(500)
+        return response_schema.dump(response_builder.build()), 500

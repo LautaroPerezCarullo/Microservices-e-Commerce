@@ -3,7 +3,7 @@ from marshmallow import ValidationError
 from .exceptions import InsufficientStockError
 from .service import StockService
 from .mapping import StockSchema, ResponseSchema, ResponseBuilder
-
+from sqlalchemy.exc import OperationalError
 import logging
 
 
@@ -31,6 +31,11 @@ def add():
         response_builder.add_message("Validation error").add_status_code(422).add_data(e.messages)
         logging.info("Validation Error")
         return response_schema.dump(response_builder.build()), 422
+    
+    except OperationalError as e:
+        response_builder.add_message(str(e)).add_status_code(503)
+        logging.info("Can't Connect to Database")
+        return response_schema.dump(response_builder.build()), 503
     
     except Exception as e:
         response_builder.add_message(f"An unexpected error occurred adding stock transaction: {str(e)}").add_status_code(500)

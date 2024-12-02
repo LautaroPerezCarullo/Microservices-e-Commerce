@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from marshmallow import ValidationError
+from sqlalchemy.exc import OperationalError
 from .service import PaymentService
 from .mapping import PaymentSchema, ResponseSchema, ResponseBuilder
 
@@ -18,6 +19,9 @@ def save():
         data = payment_schema.dump(payment_service.save(payment))
         response_builder.add_message("Payment added").add_status_code(201).add_data(data)
         return response_schema.dump(response_builder.build()), 201
+    except OperationalError as e:
+        response_builder.add_message("Can't set connection with database").add_status_code(503).add_data(e.messages)
+        return response_schema.dump(response_builder.build()), 503
     except ValidationError as err:
         response_builder.add_message("Validation error").add_status_code(422).add_data(err.messages)
         return response_schema.dump(response_builder.build()), 422
@@ -27,9 +31,16 @@ def save():
     
 @payment_bp.route('/payments/<int:id>', methods=['DELETE'])   
 def delete(id):
-    payment = payment_service.delete(id)
-    if payment.deleted_at:
-        status_code = 200
-    else:
-        status_code = 500
-    return payment_schema.dump(payment), status_code
+    response_builder = ResponseBuilder()
+    try:
+        data = payment_service.delete(id)
+        response_builder.add_message("Payment soft deleted").add_status_code(200).add_data(data)
+        return response_schema.dump(response_builder.build()), 200
+    
+    except OperationalError as e:
+        response_builder.add_message("Can't set connection with database").add_status_code(503).add_data(e.messages)
+        return response_schema.dump(response_builder.build()), 503
+    
+    except Exception as e:
+        response_builder.add_message(f"An unexpected error occurred compensating payment: {str(e)}").add_status_code(500)
+        return response_schema.dump(response_builder.build()), 500
