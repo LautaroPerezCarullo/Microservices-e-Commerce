@@ -2,8 +2,8 @@ from .model import Product
 from .repository import ProductRepository
 from app import cache
 from tenacity import retry, wait_fixed, stop_after_attempt
-from typing import List, Optional
 from sqlalchemy.exc import OperationalError
+from typing import List, Optional
 import logging
 
 
@@ -27,6 +27,7 @@ class ProductService:
                 products = repository.all()
                 if products: cache.set('all_products', products, timeout=120) 
             return products
+        
         except OperationalError as e:
             logging.error(f"Error connecting database: {str(e)}")
             raise 
