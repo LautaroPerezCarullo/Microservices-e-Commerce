@@ -36,7 +36,7 @@ def add():
 def delete(id):
     response_builder = ResponseBuilder()
     try:
-        data = purchase_service.delete(id)
+        data = purchase_schema.dump(purchase_service.delete(id))
         response_builder.add_message("Purchase soft deleted").add_status_code(200).add_data(data)
         return response_schema.dump(response_builder.build()), 200
     

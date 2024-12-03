@@ -33,7 +33,7 @@ def save():
 def delete(id):
     response_builder = ResponseBuilder()
     try:
-        data = payment_service.delete(id)
+        data = payment_schema.dump(payment_service.delete(id))
         response_builder.add_message("Payment soft deleted").add_status_code(200).add_data(data)
         return response_schema.dump(response_builder.build()), 200
     

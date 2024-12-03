@@ -3,7 +3,7 @@ from marshmallow import validate, fields, Schema, post_load
 
 class PaymentSchema(Schema):
     id = fields.Integer(dump_only=True)
-    product_id = fields.Integer(required=True, validate=validate.Range(min=1, max=5))
+    product_id = fields.Integer(required=True, validate=validate.Range(min=1, max=6))
     price = fields.Float(required=True, validate=validate.Range(min=0.01))
     payment_method = fields.String(required=True)
     deleted_at = fields.DateTime()
