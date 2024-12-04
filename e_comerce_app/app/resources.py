@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from .ochestrator import Orchester
+from .services import Orchester
 
 e_commerce_bp = Blueprint('e_commerce', __name__)
 orchester = Orchester()

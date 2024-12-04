@@ -14,6 +14,10 @@ services:
             - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL}
             - PURCHASE_SERVICE_URL=${PURCHASE_SERVICE_URL}
             - STOCK_SERVICE_URL=${STOCK_SERVICE_URL}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_DB=${REDIS_DB}
 
     mscatalog:
         build:
@@ -80,14 +84,13 @@ services:
             - ecommerce_network
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
+            - TEST_DB_URI=${TEST_DB_URI}
+            - DEV_DB_URI=${DEV_DB_URI}
+            - PROD_DB_URI=${PROD_DB_URI}
             - REDIS_HOST=${REDIS_HOST}
             - REDIS_PORT=${REDIS_PORT}
             - REDIS_PASSWORD=${REDIS_PASSWORD}
             - REDIS_DB=${REDIS_DB}
-            - TEST_DB_URI=${TEST_DB_URI}
-            - DEV_DB_URI=${DEV_DB_URI}
-            - PROD_DB_URI=${PROD_DB_URI}
-
 networks:
     ecommerce_network:
         external: true

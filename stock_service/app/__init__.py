@@ -8,7 +8,6 @@ import os
 db = SQLAlchemy()
 cache = Cache()
 
-
 def create_app():
     app_context = os.getenv("FLASK_CONTEXT")
     
