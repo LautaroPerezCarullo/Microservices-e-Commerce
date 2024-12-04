@@ -44,15 +44,3 @@ class ProductService:
         except OperationalError as e:
             logging.error(f"Error connecting database: {str(e)}")
             raise 
-
-    # def save(self, product: Product) -> Product:
-    #     #Save new product
-    #     return repository.save(product)
-
-    # def all(self) -> List[Product]:
-    #     #Return all products
-    #     return repository.all()
-
-    # def find(self, id: int) -> Optional[Product]:
-    #     #Return product by id
-    #     return repository.find(id)

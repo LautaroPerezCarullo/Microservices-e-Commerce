@@ -1,0 +1,15 @@
+http:
+  routers:
+    traefik:
+      rule: "Host(`traefik.ecommerce.local`)"
+      service: "api@internal"
+      tls:
+        domains:
+          - main: "ecommerce.local"
+            sans:
+              - "*.ecommerce.local"
+
+tls:
+  certificates:
+    - certFile: "/etc/certs/cert.pem"
+      keyFile: "/etc/certs/key.pem"

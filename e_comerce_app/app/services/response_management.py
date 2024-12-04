@@ -2,7 +2,6 @@ class Response_Management():
     def __init__(self, e):
         error_str = str(e)
         
-        # Extraer mensaje y código de estado
         start_msg = error_str.find("ServiceException('") + len("ServiceException('")
         end_msg = error_str.find(" (Status Code:")
         self.message = error_str[start_msg:end_msg]

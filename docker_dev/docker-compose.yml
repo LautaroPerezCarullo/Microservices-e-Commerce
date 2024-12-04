@@ -1,7 +1,7 @@
 services:
     e_commerce_app:
-        image: e_commerce:v1.0.1
-        container_name: ecommerce_app
+        image: e_commerce_dev:v1.0.0
+        container_name: ecommerce_app_dev
         ports:
             - 5000:5000
         networks:
@@ -12,10 +12,6 @@ services:
             - "traefik.http.services.ecommerce.loadbalancer.server.port=5000"
             - "traefik.http.routers.ecommerce.tls=true"
             - "traefik.docker.network=ecommerce_network"
-
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=NetworkErrorRatio() > 0.5"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - CATALOG_SERVICE_URL=${CATALOG_SERVICE_URL}
@@ -28,14 +24,24 @@ services:
             - REDIS_DB=${REDIS_DB}
 
     mscatalog:
-        image: ms_catalog:v1.0.1
-        container_name: mscatalog
+        image: ms_catalog_dev:v1.0.0
+        container_name: mscatalog_dev
         depends_on:
             - e_commerce_app
         ports:
             - 5001:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.catalog.rule=Host(`catalog.ecommerce.local`)"
+            - "traefik.http.services.catalog.loadbalancer.server.port=5000"
+            - "traefik.http.routers.catalog.tls=true"
+            - "traefik.docker.network=ecommerce_network"
+
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=NetworkErrorRatio() > 0.5"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - REDIS_HOST=${REDIS_HOST}
@@ -46,42 +52,60 @@ services:
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     mspurchase:
-        image: ms_purchase:v1.0.1
-        container_name: mspurchase
+        image: ms_purchase_dev:v1.0.0
+        container_name: mspurchase_dev
         depends_on:
             - e_commerce_app
         ports:
             - 5002:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.purchase.rule=Host(`purchase.ecommerce.local`)"
+            - "traefik.http.routers.purchase.tls=true"
+            - "traefik.http.services.purchase.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     mspayment:
-        image: ms_payment:v1.0.1
-        container_name: mspayment
+        image: ms_payment_dev:v1.0.0
+        container_name: mspayment_dev
         depends_on:
             - e_commerce_app
         ports:
             - 5003:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.payment.rule=Host(`payment.ecommerce.local`)"
+            - "traefik.http.routers.payment.tls=true"
+            - "traefik.http.services.payment.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     msstock:
-        image: ms_stock:v1.0.1
-        container_name: msstock
+        image: ms_stock_dev:v1.0.0
+        container_name: msstock_dev
         depends_on:
             - e_commerce_app
         ports:
             - 5004:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.stock.rule=Host(`stock.ecommerce.local`)"
+            - "traefik.http.routers.stock.tls=true"
+            - "traefik.http.services.stock.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}

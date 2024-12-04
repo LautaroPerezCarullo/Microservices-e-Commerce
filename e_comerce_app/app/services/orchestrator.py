@@ -19,7 +19,6 @@ class Orchester:
         amount = data['amount']
 
         current_stock = cache.get(f"current_stock_product:{product_id}")
-        logging.info(current_stock)
         if current_stock is not None:
             if current_stock < amount:
                 logging.info(f"Current stock of product {product_id}: {current_stock}")
