@@ -1,8 +1,6 @@
 services:
     e_commerce_app:
-        build:
-            context: ../e_comerce_app
-            dockerfile: Dockerfile
+        image: e_commerce:v1.0.1
         container_name: ecommerce_app
         ports:
             - 5000:5000
@@ -20,9 +18,7 @@ services:
             - REDIS_DB=${REDIS_DB}
 
     mscatalog:
-        build:
-            context: ../catalog_service
-            dockerfile: Dockerfile
+        image: ms_catalog:v1.0.1
         container_name: mscatalog
         depends_on:
             - e_commerce_app
@@ -40,9 +36,7 @@ services:
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     mspurchase:
-        build:
-            context: ../purchase_service
-            dockerfile: Dockerfile
+        image: ms_purchase:v1.0.1
         container_name: mspurchase
         depends_on:
             - e_commerce_app
@@ -56,9 +50,7 @@ services:
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     mspayment:
-        build:
-            context: ../payment_service
-            dockerfile: Dockerfile
+        image: ms_payment:v1.0.1
         container_name: mspayment
         depends_on:
             - e_commerce_app
@@ -72,9 +64,7 @@ services:
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
     msstock:
-        build:
-            context: ../stock_service
-            dockerfile: Dockerfile
+        image: ms_stock:v1.0.1
         container_name: msstock
         depends_on:
             - e_commerce_app

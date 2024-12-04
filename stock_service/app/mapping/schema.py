@@ -3,7 +3,7 @@ from marshmallow import validate, fields, Schema, post_load
 
 class StockSchema(Schema):
     id = fields.Integer(dump_only=True)
-    product_id = fields.Integer(required=True, validate=validate.Range(min=1, max=5))
+    product_id = fields.Integer(required=True, validate=validate.Range(min=1, max=6))
     transaction_date = fields.DateTime()
     amount = fields.Integer(required=True, validate=validate.Range(min=1))
     input_output = fields.Integer(required=True, validate=validate.Range(min=1, max=2))  
