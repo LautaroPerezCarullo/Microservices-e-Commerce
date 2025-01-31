@@ -12,10 +12,11 @@ services:
             - "traefik.http.services.ecommerce.loadbalancer.server.port=5000"
             - "traefik.http.routers.ecommerce.tls=true"
             - "traefik.docker.network=ecommerce_network"
-
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
-            - "traefik.http.middlewares.ecommerce.circuitbreaker.expression=NetworkErrorRatio() > 0.5"
+        extra_hosts:
+            - "catalog.ecommerce.local:172.20.0.1"
+            - "purchase.ecommerce.local:172.20.0.1"
+            - "payment.ecommerce.local:172.20.0.1"
+            - "stock.ecommerce.local:172.20.0.1"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - CATALOG_SERVICE_URL=${CATALOG_SERVICE_URL}
@@ -36,6 +37,16 @@ services:
             - 5001:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.catalog.rule=Host(`catalog.ecommerce.local`)"
+            - "traefik.http.services.catalog.loadbalancer.server.port=5000"
+            - "traefik.http.routers.catalog.tls=true"
+            - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 100"
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - REDIS_HOST=${REDIS_HOST}
@@ -45,6 +56,7 @@ services:
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
+
     mspurchase:
         image: ms_purchase:v1.0.1
         container_name: mspurchase
@@ -54,11 +66,22 @@ services:
             - 5002:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.purchase.rule=Host(`purchase.ecommerce.local`)"
+            - "traefik.http.routers.purchase.tls=true"
+            - "traefik.http.services.purchase.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
+
     mspayment:
         image: ms_payment:v1.0.1
         container_name: mspayment
@@ -68,11 +91,22 @@ services:
             - 5003:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.payment.rule=Host(`payment.ecommerce.local`)"
+            - "traefik.http.routers.payment.tls=true"
+            - "traefik.http.services.payment.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
             - DEV_DB_URI=${DEV_DB_URI}
             - PROD_DB_URI=${PROD_DB_URI}
+
     msstock:
         image: ms_stock:v1.0.1
         container_name: msstock
@@ -82,6 +116,16 @@ services:
             - 5004:5000
         networks:
             - ecommerce_network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.stock.rule=Host(`stock.ecommerce.local`)"
+            - "traefik.http.routers.stock.tls=true"
+            - "traefik.http.services.stock.loadbalancer.server.port=5000"
+            - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
@@ -91,6 +135,7 @@ services:
             - REDIS_PORT=${REDIS_PORT}
             - REDIS_PASSWORD=${REDIS_PASSWORD}
             - REDIS_DB=${REDIS_DB}
+
 networks:
     ecommerce_network:
         external: true

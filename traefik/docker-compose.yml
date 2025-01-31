@@ -18,7 +18,9 @@ services:
             - ecommerce_network
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.traefik=true"
+            - "traefik.http.routers.traefik.rule=Host(`traefik.ecommerce.local`)"
+            - "traefik.http.routers.traefik.service=api@internal"
+            - "traefik.http.routers.traefik.tls=true"
 networks:
     ecommerce_network:
         external: true

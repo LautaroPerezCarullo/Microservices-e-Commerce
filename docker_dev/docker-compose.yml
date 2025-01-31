@@ -12,6 +12,11 @@ services:
             - "traefik.http.services.ecommerce.loadbalancer.server.port=5000"
             - "traefik.http.routers.ecommerce.tls=true"
             - "traefik.docker.network=ecommerce_network"
+        extra_hosts:
+            - "catalog.ecommerce.local:172.20.0.1"
+            - "purchase.ecommerce.local:172.20.0.1"
+            - "payment.ecommerce.local:172.20.0.1"
+            - "stock.ecommerce.local:172.20.0.1"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - CATALOG_SERVICE_URL=${CATALOG_SERVICE_URL}
@@ -38,10 +43,10 @@ services:
             - "traefik.http.services.catalog.loadbalancer.server.port=5000"
             - "traefik.http.routers.catalog.tls=true"
             - "traefik.docker.network=ecommerce_network"
-
-            - "traefik.http.middlewares.catalog.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+            # Circuit Breakers
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 100"
             - "traefik.http.middlewares.catalog.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
-            - "traefik.http.middlewares.catalog.circuitbreaker.expression=NetworkErrorRatio() > 0.5"
+            - "traefik.http.middlewares.catalog.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - REDIS_HOST=${REDIS_HOST}
@@ -66,6 +71,10 @@ services:
             - "traefik.http.routers.purchase.tls=true"
             - "traefik.http.services.purchase.loadbalancer.server.port=5000"
             - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.purchase.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
@@ -86,6 +95,10 @@ services:
             - "traefik.http.routers.payment.tls=true"
             - "traefik.http.services.payment.loadbalancer.server.port=5000"
             - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.payment.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}
@@ -106,6 +119,10 @@ services:
             - "traefik.http.routers.stock.tls=true"
             - "traefik.http.services.stock.loadbalancer.server.port=5000"
             - "traefik.docker.network=ecommerce_network"
+            # Circuit Breakers
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.stock.circuitbreaker.expression=NetworkErrorRatio() > 0.25"
         environment:
             - FLASK_CONTEXT=${FLASK_CONTEXT}
             - TEST_DB_URI=${TEST_DB_URI}

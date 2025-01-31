@@ -19,7 +19,7 @@ class MS_StockService:
         self.id = None
 
     def stock_transaction(self, product_id, amount, input_output):
-        response = requests.post(f"{self.stock_url}/stocks/add_output", json={"product_id": product_id, "amount": amount, "input_output": input_output})
+        response = requests.post(f"{self.stock_url}/stocks/add_output", json={"product_id": product_id, "amount": amount, "input_output": input_output}, verify=False)
         if response.status_code == 201:
             self.id = response.json().get("data", {}).get("id")
             logging.info(f"Succesful stock transaction ID: {self.id}")
@@ -30,7 +30,7 @@ class MS_StockService:
         
     def stock_compensation(self, product_id, amount, input_output):
         if self.id:
-            response = requests.post(f"{self.stock_url}/stocks/add_input", json={"product_id": product_id, "amount": amount, "input_output": input_output})
+            response = requests.post(f"{self.stock_url}/stocks/add_input", json={"product_id": product_id, "amount": amount, "input_output": input_output}, verify=False)
             if response.status_code == 201:
                 self.compensation_id = response.json().get("data", {}).get("id")
                 logging.info(f"Succesful stock compensation ID: {self.compensation_id}")
