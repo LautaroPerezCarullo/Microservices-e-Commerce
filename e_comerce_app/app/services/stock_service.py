@@ -1,4 +1,5 @@
 import requests
+from tenacity import retry, stop_after_attempt, wait_fixed
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -18,6 +19,7 @@ class MS_StockService:
         self.stock_url = os.getenv("STOCK_SERVICE_URL")
         self.id = None
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2)) 
     def stock_transaction(self, product_id, amount, input_output):
         response = requests.post(f"{self.stock_url}/stocks/add_output", json={"product_id": product_id, "amount": amount, "input_output": input_output}, verify=False)
         if response.status_code == 201:
@@ -28,6 +30,7 @@ class MS_StockService:
             logging.info(response.json().get('message'))
             raise ServiceException(response.json().get('message'), response.status_code)
         
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))    
     def stock_compensation(self, product_id, amount, input_output):
         if self.id:
             response = requests.post(f"{self.stock_url}/stocks/add_input", json={"product_id": product_id, "amount": amount, "input_output": input_output}, verify=False)

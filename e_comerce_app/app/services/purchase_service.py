@@ -1,5 +1,6 @@
 import requests
 import os
+from tenacity import retry, stop_after_attempt, wait_fixed
 from dotenv import load_dotenv
 from pathlib import Path
 from .exceptions import ServiceException
@@ -13,6 +14,7 @@ class MS_PurchaseService:
     def __init__(self):
         self.purchase_url = os.getenv("PURCHASE_SERVICE_URL")
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def purchase_processing(self, product_id, delivery_address):
         response = requests.post(f"{self.purchase_url}/purchases/add", json={"product_id": product_id, "delivery_address": delivery_address}, verify=False)
         if response.status_code == 201:
@@ -22,6 +24,7 @@ class MS_PurchaseService:
             logging.info(response.json().get('message'))
             raise ServiceException(response.json().get('message'), response.status_code)
         
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))    
     def cancel_purchase(self, purchase_id):
         response = requests.delete(f"{self.purchase_url}/purchases/{purchase_id}", verify=False)
         if response.status_code == 200:

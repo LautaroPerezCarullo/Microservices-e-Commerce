@@ -1,4 +1,5 @@
 import requests
+from tenacity import retry, stop_after_attempt, wait_fixed
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,6 +14,7 @@ class MS_PaymentService:
     def __init__(self):
         self.payment_url = os.getenv("PAYMENT_SERVICE_URL")
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def payment_processing(self, product_id, price, payment_method):
         response = requests.post(f"{self.payment_url}/payments/add", json={"product_id": product_id, "price": price, "payment_method": payment_method}, verify=False)
 
@@ -23,6 +25,7 @@ class MS_PaymentService:
             logging.info(response.json().get('message'))
             raise ServiceException(response.json().get('message'), response.status_code)
         
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))     
     def cancel_payment(self, payment_id):
         response = requests.delete(f"{self.payment_url}/payments/{payment_id}", verify=False)
         if response.status_code == 200:
