@@ -30,17 +30,19 @@ services:
 
     mscatalog:
         image: ms_catalog:v1.0.1
-        container_name: mscatalog
+        # container_name: mscatalog
         depends_on:
             - e_commerce_app
-        ports:
-            - 5001:5000
+        # ports:
+        #     - 5001:5000
         networks:
             - ecommerce_network
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.catalog.rule=Host(`catalog.ecommerce.local`)"
             - "traefik.http.services.catalog.loadbalancer.server.port=5000"
+            - "traefik.http.services.catalog.loadbalancer.sticky.cookie.name=mscatalog_session"
+            - "traefik.http.services.catalog.loadbalancer.sticky.cookie.secure=true"
             - "traefik.http.routers.catalog.tls=true"
             - "traefik.docker.network=ecommerce_network"
             # Circuit Breakers
@@ -59,11 +61,11 @@ services:
 
     mspurchase:
         image: ms_purchase:v1.0.1
-        container_name: mspurchase
+        # container_name: mspurchase
         depends_on:
             - e_commerce_app
-        ports:
-            - 5002:5000
+        # ports:
+        #     - 5002:5000
         networks:
             - ecommerce_network
         labels:
@@ -71,6 +73,8 @@ services:
             - "traefik.http.routers.purchase.rule=Host(`purchase.ecommerce.local`)"
             - "traefik.http.routers.purchase.tls=true"
             - "traefik.http.services.purchase.loadbalancer.server.port=5000"
+            - "traefik.http.services.purchase.loadbalancer.sticky.cookie.name=mspurchase_session"
+            - "traefik.http.services.purchase.loadbalancer.sticky.cookie.secure=true"
             - "traefik.docker.network=ecommerce_network"
             # Circuit Breakers
             - "traefik.http.middlewares.purchase.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
@@ -84,11 +88,11 @@ services:
 
     mspayment:
         image: ms_payment:v1.0.1
-        container_name: mspayment
+        # container_name: mspayment
         depends_on:
             - e_commerce_app
-        ports:
-            - 5003:5000
+        # ports:
+        #     - 5003:5000
         networks:
             - ecommerce_network
         labels:
@@ -96,6 +100,8 @@ services:
             - "traefik.http.routers.payment.rule=Host(`payment.ecommerce.local`)"
             - "traefik.http.routers.payment.tls=true"
             - "traefik.http.services.payment.loadbalancer.server.port=5000"
+            - "traefik.http.services.payment.loadbalancer.sticky.cookie.name=mspayment_session"
+            - "traefik.http.services.payment.loadbalancer.sticky.cookie.secure=true"
             - "traefik.docker.network=ecommerce_network"
             # Circuit Breakers
             - "traefik.http.middlewares.payment.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
@@ -109,11 +115,11 @@ services:
 
     msstock:
         image: ms_stock:v1.0.1
-        container_name: msstock
+        # container_name: msstock
         depends_on:
             - e_commerce_app
-        ports:
-            - 5004:5000
+        # ports:
+        #     - 5004:5000
         networks:
             - ecommerce_network
         labels:
@@ -121,6 +127,8 @@ services:
             - "traefik.http.routers.stock.rule=Host(`stock.ecommerce.local`)"
             - "traefik.http.routers.stock.tls=true"
             - "traefik.http.services.stock.loadbalancer.server.port=5000"
+            - "traefik.http.services.stock.loadbalancer.sticky.cookie.name=msstock_session"
+            - "traefik.http.services.stock.loadbalancer.sticky.cookie.secure=true"
             - "traefik.docker.network=ecommerce_network"
             # Circuit Breakers
             - "traefik.http.middlewares.stock.circuitbreaker.expression=LatencyAtQuantileMS(75.0) > 150"
