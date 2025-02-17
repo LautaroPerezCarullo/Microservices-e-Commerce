@@ -1,16 +1,13 @@
-from ..response_schema import ResponseSchema
 from app import cache
 from saga import SagaBuilder, SagaError
 import logging
 from . import MS_CatalogService, MS_PurchaseService, MS_PaymentService, MS_StockService, Response_Management
 logging.basicConfig(level=logging.INFO)
 
-
-response_schema = ResponseSchema()
-catalog_service = MS_CatalogService()
-
 class Orchester:
       
+    catalog_service = MS_CatalogService()
+
     def purchase(self, product_id, data):
 
         delivery_address = data['delivery_address']
@@ -23,7 +20,10 @@ class Orchester:
             if current_stock < amount:
                 logging.info(f"Current stock of product {product_id}: {current_stock}")
                 logging.info("Not Enough Stock")
-                return {"message": f"Insufficient Stock, Product {product_id}"}, 400
+                return {
+                    "message": f"Insufficient Stock, Product {product_id}",
+                    "current_stock": current_stock
+                }, 409
         logging.info("Current Stock isn't in cache memory")
 
         purchase_service = MS_PurchaseService()

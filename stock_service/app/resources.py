@@ -13,7 +13,7 @@ stock_schema = StockSchema()
 response_schema = ResponseSchema()
 stock_service = StockService()
 
-@stock_bp.route('/stocks/add_output', methods=['POST'])
+@stock_bp.route('/stocks/output', methods=['POST'])
 def add_output():
     response_builder = ResponseBuilder()
     try:
@@ -23,9 +23,9 @@ def add_output():
         return response_schema.dump(response_builder.build()), 201
         
     except InsufficientStockError as e:
-        response_builder.add_message(str(e)).add_status_code(400)
+        response_builder.add_message(str(e)).add_status_code(409)
         logging.info("Not Enough Stock")
-        return response_schema.dump(response_builder.build()), 400
+        return response_schema.dump(response_builder.build()), 409
         
     except ValidationError as e:
         response_builder.add_message("Validation error").add_status_code(422).add_data(e.messages)
@@ -42,7 +42,7 @@ def add_output():
         logging.info("Stock Transaction Error")
         return response_schema.dump(response_builder.build()), 500
     
-@stock_bp.route('/stocks/add_input', methods=['POST'])
+@stock_bp.route('/stocks/input', methods=['POST'])
 def add_input():
     response_builder = ResponseBuilder()
     try:

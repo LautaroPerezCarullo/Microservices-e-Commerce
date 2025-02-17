@@ -4,4 +4,9 @@ class ServiceException(Exception):
         self.message = message
         self.status_code = status_code
 
+class RetryableRequestException(Exception):
+    def __init__(self, original_exception):
+        self.original_exception = original_exception
+        super().__init__(f"Retryable error: {str(original_exception)}")
+
 
